@@ -10,8 +10,8 @@ module CheckGraphite
 
     on "--endpoint ENDPOINT", "-H ENDPOINT", :mandatory
     on "--metric METRIC", "-M METRIC", :mandatory
-    on "--from TIMEFRAME", "-F TIMEFRAME", default: "30seconds"
-    on "--name NAME", "-N NAME", default: :value
+    on "--from TIMEFRAME", "-F TIMEFRAME", :default => "30seconds"
+    on "--name NAME", "-N NAME", :default => :value
 
     enable_warning
     enable_critical
