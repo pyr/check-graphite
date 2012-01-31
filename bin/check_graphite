@@ -1,0 +1,4 @@
+#!/usr/bin/env/ruby
+
+require 'check_graphite'
+CheckGraphite::Command.new.run
