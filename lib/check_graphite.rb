@@ -1,6 +1,6 @@
 require "nagios_check"
 require "json"
-require "http"
+require "net/http"
 require "check_graphite/version"
 
 module CheckGraphite
@@ -12,15 +12,29 @@ module CheckGraphite
     on "--metric METRIC", "-M METRIC", :mandatory
     on "--from TIMEFRAME", "-F TIMEFRAME", :default => "30seconds"
     on "--name NAME", "-N NAME", :default => :value
+    on "--username USERNAME", "-U USERNAME"
+    on "--password PASSWORD", "-P PASSWORD"
 
     enable_warning
     enable_critical
     enable_timeout
 
     def check
-      data = Http.get "#{options.endpoint}?target=#{options.metric}&from=-#{options.from}&format=json"
-      raise "no such metric registered" unless data.length > 0
-      res = data.first["datapoints"].reduce({:sum => 0.0, :count => 0}) {|acc, e|
+      uri = URI(URI.encode("#{options.endpoint}?target=#{options.metric}&from=-#{options.from}&format=json"))
+      req = Net::HTTP::Get.new(uri.request_uri)
+
+      # use basic auth if username is set
+      if options.username
+        req.basic_auth options.username, options.password
+      end
+
+      res = Net::HTTP.start(uri.hostname, uri.port) { |http|
+        http.request(req)
+      }
+
+      res.code == "200" || raise("HTTP error code #{res.code}")
+
+      res = JSON(res.body).first["datapoints"].reduce({:sum => 0.0, :count => 0}) {|acc, e|
         if e[0]
           {:sum => acc[:sum] + e[0], :count => acc[:count] + 1}
         else
