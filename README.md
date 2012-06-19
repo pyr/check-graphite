@@ -13,6 +13,8 @@ check_graphite accepts the following options:
 * `-M' or `--metric`: the metric expression which will be queried, it can be an expression
 * `-F` or `--from`: time frame for which to query metrics, defaults to "30seconds"
 * `-N` or `--name`: name to give to the metric, defaults to "value"
+* `-U` or `--username`: username used for basic authentication
+* `-P` or `--password`: password used for basic authentication
 * `-w`: warning threshold for the metric
 * `-c`: critical threshold for the metric
 * `-t`: timeout after which the metric should be considered unknown

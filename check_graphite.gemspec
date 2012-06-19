@@ -21,5 +21,7 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
   s.add_runtime_dependency "nagios_check"
-  s.add_runtime_dependency "http"
+
+  s.add_development_dependency "rspec"
+  s.add_development_dependency "fakeweb"
 end
