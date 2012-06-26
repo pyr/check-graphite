@@ -30,7 +30,7 @@ module CheckGraphite
         req.basic_auth options.username, options.password
       end
 
-      res = Net::HTTP.start(uri.hostname, uri.port) { |http|
+      res = Net::HTTP.start(uri.host, uri.port) { |http|
         http.request(req)
       }
 
