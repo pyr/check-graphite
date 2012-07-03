@@ -36,10 +36,10 @@ module CheckGraphite
 
       res.code == "200" || raise("HTTP error code #{res.code}")
 
-      datapoints = JSON(res.body).first["datapoints"]                      
-      res = datapoints.drop(options.dropfirst)
-                      .take(datapoints.length - options.dropfirst - options.droplast)
-                      .reduce({:sum => 0.0, :count => 0}) {|acc, e|
+      datapoints = JSON(res.body).first["datapoints"]
+      res = datapoints.drop(options.dropfirst).
+                      take(datapoints.length - options.dropfirst - options.droplast).
+                      reduce({:sum => 0.0, :count => 0}) {|acc, e|
         if e[0]
           {:sum => acc[:sum] + e[0], :count => acc[:count] + 1}
         else
