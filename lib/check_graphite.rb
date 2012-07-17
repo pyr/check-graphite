@@ -47,7 +47,9 @@ module CheckGraphite
         end
       }
       raise "no valid datapoints" if res[:count] == 0
-      store_value options.name, (res[:sum] / res[:count])
+      value = res[:sum] / res[:count]
+      store_value options.name, value
+      store_message "#{options.name}=#{value}"
     end
   end
 end
