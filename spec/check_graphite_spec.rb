@@ -50,7 +50,7 @@ describe CheckGraphite::Command do
     it "should fail with bad username and password" do
       ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -U baduser -P badpass }
       c = CheckGraphite::Command.new
-      STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: HTTP error code 401/)
+      STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?HTTP error code 401/)
       lambda { c.run }.should raise_error SystemExit
     end
   end
