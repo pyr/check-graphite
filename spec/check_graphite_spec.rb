@@ -18,14 +18,14 @@ describe CheckGraphite::Command do
     it "should just work" do
       ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm }
       c = CheckGraphite::Command.new
-      STDOUT.should_receive(:puts).with("OK|value=2.0;;;;")
+      STDOUT.should_receive(:puts).with("OK: value=2.0|value=2.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
     it "should be critical" do
       ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -c 0 }
       c = CheckGraphite::Command.new
-      STDOUT.should_receive(:puts).with("CRITICAL|value=2.0;;;;")
+      STDOUT.should_receive(:puts).with("CRITICAL: value=2.0|value=2.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
   end
@@ -43,7 +43,7 @@ describe CheckGraphite::Command do
     it "should work with valid username and password" do
       ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -U testuser -P testpass}
       c = CheckGraphite::Command.new
-      STDOUT.should_receive(:puts).with("OK|value=2.0;;;;")
+      STDOUT.should_receive(:puts).with("OK: value=2.0|value=2.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
