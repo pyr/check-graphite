@@ -11,21 +11,64 @@ describe CheckGraphite::Command do
   describe "it should make http requests and return data" do
     before do
       FakeWeb.register_uri(:get, "http://your.graphite.host/render?target=collectd.somebox.load.load.midterm&from=-30seconds&format=json",
-                           :body => '[{"target": "default.test.boottime", "datapoints": [[1.0, 1339512060], [3.0, 1339512120]]}]',
+                           :body => '[{"target": "default.test.boottime", "datapoints": [[1.0, 1339512060], [2.0, 1339512120], [6.0, 1339512180], [7.0, 1339512240]]}]',
                            :content_type => "application/json")
     end
 
-    it "should just work" do
+    it "should return OK" do
       ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm }
       c = CheckGraphite::Command.new
-      STDOUT.should_receive(:puts).with("OK: value=2.0|value=2.0;;;;")
+      STDOUT.should_receive(:puts).with("OK: value=4.0|value=4.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
-    it "should be critical" do
+    it "should return WARNING" do
+      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -w 0 }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with("WARNING: value=4.0|value=4.0;;;;")
+      lambda { c.run }.should raise_error SystemExit
+    end
+
+    it "should return CRITICAL" do
       ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -c 0 }
       c = CheckGraphite::Command.new
-      STDOUT.should_receive(:puts).with("CRITICAL: value=2.0|value=2.0;;;;")
+      STDOUT.should_receive(:puts).with("CRITICAL: value=4.0|value=4.0;;;;")
+      lambda { c.run }.should raise_error SystemExit
+    end
+
+    it "should honour dropfirst" do
+      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --dropfirst 1 }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with("OK: value=5.0|value=5.0;;;;")
+      lambda { c.run }.should raise_error SystemExit
+    end
+
+    it "should honour droplast" do
+      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --droplast 1 }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with("OK: value=3.0|value=3.0;;;;")
+      lambda { c.run }.should raise_error SystemExit
+    end
+
+    it "should honour dropfirst and droplast together" do
+      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --dropfirst 1 --droplast 1 }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with("OK: value=4.0|value=4.0;;;;")
+      lambda { c.run }.should raise_error SystemExit
+    end
+  end
+
+  describe "when data contains null values" do
+    before do
+      FakeWeb.register_uri(:get, "http://your.graphite.host/render?target=collectd.somebox.load.load.midterm&from=-30seconds&format=json",
+                           :body => '[{"target": "default.test.boottime", "datapoints": [[1.0, 1339512060], [null, 1339512120], [null, 1339512180], [3.0, 1339512240]]}]',
+                           :content_type => "application/json")
+    end
+
+    it "should discard them" do
+      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with("OK: value=2.0|value=2.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
   end
