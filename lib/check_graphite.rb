@@ -34,20 +34,20 @@ module CheckGraphite
         http.request(req)
       }
 
-      res.code == "200" || raise("HTTP error code #{res.code}")
+      raise "HTTP error code #{res.code}" unless res.code == "200"
+      raise "no data returned for target" if res.body == "[]"
 
       datapoints = JSON(res.body).first["datapoints"]
-      res = datapoints.drop(options.dropfirst).
-                      take(datapoints.length - options.dropfirst - options.droplast).
-                      reduce({:sum => 0.0, :count => 0}) {|acc, e|
-        if e[0]
-          {:sum => acc[:sum] + e[0], :count => acc[:count] + 1}
-        else
-          acc
-        end
-      }
+      datapoints = datapoints.slice(
+        options.dropfirst,
+        (datapoints.size - options.dropfirst - options.droplast)
+      )
+      datapoints.reject! { |v| v.first.nil? }
+      sum = datapoints.reduce(0.0) {|acc, v| acc + v.first }
+
       raise "no valid datapoints" if res[:count] == 0
-      value = res[:sum] / res[:count]
+
+      value = sum / datapoints.size
       store_value options.name, value
       store_message "#{options.name}=#{value}"
     end
