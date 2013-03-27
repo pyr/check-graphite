@@ -73,6 +73,21 @@ describe CheckGraphite::Command do
     end
   end
 
+  describe "when Graphite returns no datapoints" do
+    before do
+      FakeWeb.register_uri(:get, "http://your.graphite.host/render?target=value.does.not.exist&from=-30seconds&format=json",
+                           :body => '[]',
+                           :content_type => "application/json")
+    end
+
+    it "should be unknown" do
+      ARGV = %w{ -H http://your.graphite.host/render -M value.does.not.exist }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?no data returned for target/)
+      lambda { c.run }.should raise_error SystemExit
+    end
+  end
+
   describe "it should make http requests with basic auth and return data" do
     before do
       FakeWeb.register_uri(:get, "http://baduser:badpass@your.graphite.host/render?target=collectd.somebox.load.load.midterm&from=-30seconds&format=json",

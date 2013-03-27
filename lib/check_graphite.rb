@@ -35,6 +35,7 @@ module CheckGraphite
       }
 
       raise "HTTP error code #{res.code}" unless res.code == "200"
+      raise "no data returned for target" if res.body == "[]"
 
       datapoints = JSON(res.body).first["datapoints"]
       datapoints = datapoints.slice(
