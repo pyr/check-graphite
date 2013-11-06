@@ -1,6 +1,6 @@
 require "nagios_check"
 require "json"
-require "net/http"
+require "net/https"
 require "check_graphite/version"
 
 module CheckGraphite
@@ -30,7 +30,7 @@ module CheckGraphite
         req.basic_auth options.username, options.password
       end
 
-      res = Net::HTTP.start(uri.host, uri.port) { |http|
+      res = Net::HTTP.start(uri.host, uri.port, :use_ssl => 'https' == uri.scheme) { |http|
         http.request(req)
       }
 
