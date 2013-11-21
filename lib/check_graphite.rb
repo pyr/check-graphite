@@ -42,11 +42,12 @@ module CheckGraphite
         options.dropfirst,
         (datapoints.size - options.dropfirst - options.droplast)
       )
+
+      # Remove NULL values. Return UNKNOWN if there's nothing left.
       datapoints.reject! { |v| v.first.nil? }
+      raise "no valid datapoints" if datapoints.size == 0
+
       sum = datapoints.reduce(0.0) {|acc, v| acc + v.first }
-
-      raise "no valid datapoints" if res[:count] == 0
-
       value = sum / datapoints.size
       store_value options.name, value
       store_message "#{options.name}=#{value}"
