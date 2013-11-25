@@ -73,7 +73,7 @@ describe CheckGraphite::Command do
     end
   end
 
-  describe "when Graphite returns no datapoints" do
+  describe "when Graphite returns no data at all" do
     before do
       FakeWeb.register_uri(:get, "http://your.graphite.host/render?target=value.does.not.exist&from=-30seconds&format=json",
                            :body => '[]',
@@ -84,6 +84,21 @@ describe CheckGraphite::Command do
       ARGV = %w{ -H http://your.graphite.host/render -M value.does.not.exist }
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?no data returned for target/)
+      lambda { c.run }.should raise_error SystemExit
+    end
+  end
+
+  describe "when Graphite returns only NULL values" do
+    before do
+      FakeWeb.register_uri(:get, "http://your.graphite.host/render?target=all.values.null&from=-30seconds&format=json",
+                           :body => '[{"target": "all.values.null", "datapoints": [[null, 1339512060], [null, 1339512120], [null, 1339512180], [null, 1339512240]]}]',
+                           :content_type => "application/json")
+    end
+
+    it "should be unknown" do
+      ARGV = %w{ -H http://your.graphite.host/render -M all.values.null }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?no valid datapoints/)
       lambda { c.run }.should raise_error SystemExit
     end
   end
