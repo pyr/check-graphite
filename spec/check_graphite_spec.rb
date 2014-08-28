@@ -103,6 +103,21 @@ describe CheckGraphite::Command do
     end
   end
 
+  describe "when Graphite returns multiple targets" do
+    before do
+      FakeWeb.register_uri(:get, "http://your.graphite.host/render?target=collectd.somebox*.load.load.midterm&from=-30seconds&format=json",
+                           :body => '[{"target": "collectd.somebox2.load.load.midterm", "datapoints": [[null, 1339512060], [null, 1339512120], [null, 1339512180], [null, 1339512240]]},{"target": "collectd.somebox1.load.load.midterm", "datapoints": [[1.0, 1339512060], [2.0, 1339512120], [6.0, 1339512180], [7.0, 1339512240]]}]',
+                           :content_type => "application/json")
+    end
+
+    it "should return OK" do
+      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox*.load.load.midterm }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with("OK: value=4.0|value=4.0;;;;")
+      lambda { c.run }.should raise_error SystemExit
+    end
+  end
+
   describe "it should make http requests with basic auth and return data" do
     before do
       FakeWeb.register_uri(:get, "http://baduser:badpass@your.graphite.host/render?target=collectd.somebox.load.load.midterm&from=-30seconds&format=json",
