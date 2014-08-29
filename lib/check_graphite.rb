@@ -37,7 +37,7 @@ module CheckGraphite
       raise "HTTP error code #{res.code}" unless res.code == "200"
       raise "no data returned for target" if res.body == "[]"
 
-      datapoints = JSON(res.body).first["datapoints"]
+      datapoints = JSON(res.body).map { |e| e["datapoints"] }.reduce { |a, b| a + b }
       datapoints = datapoints.slice(
         options.dropfirst,
         (datapoints.size - options.dropfirst - options.droplast)
