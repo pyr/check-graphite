@@ -22,6 +22,7 @@ check_graphite accepts the following options:
 * `-w`: warning threshold for the metric
 * `-c`: critical threshold for the metric
 * `-t`: timeout after which the metric should be considered unknown
+* `--niltozero`: converts nils to floating point zeros (0.0) in order to handle metrics that only emit non zero values
 
 ## How it works
 
