@@ -23,7 +23,7 @@ module CheckGraphite
     enable_timeout
 
     def check
-      raise 'Invalid value for --niltozero (true or false)' unless options.niltozero == 'true' or options.niltozero == 'false'
+      raise 'Invalid value for --niltozero (true or false)' unless options.niltozero == 'true' || options.niltozero == 'false'
 
       uri = URI(URI.encode("#{options.endpoint}?target=#{options.metric}&from=-#{options.from}&format=json"))
       req = Net::HTTP::Get.new(uri.request_uri)
@@ -50,7 +50,7 @@ module CheckGraphite
       datapoints.reject! { |v| v.first.nil? } unless options.niltozero == 'true'
       raise "no valid datapoints" if datapoints.size == 0
 
-      sum = datapoints.reduce(0.0) {|acc, v| acc + v.first.to_f }
+      sum = datapoints.reduce(0.0) { |acc, v| acc + v.first.to_f }
       value = sum / datapoints.size
       store_value options.name, value
       store_message "#{options.name}=#{value}"
