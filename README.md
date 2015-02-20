@@ -14,7 +14,7 @@ WARNING|load=1.4400000000000002;;;;
 check_graphite accepts the following options:
 
 * `-H` or `--endpoint`: the graphite HTTP endpoint which can be queried
-* `-M' or `--metric`: the metric expression which will be queried, it can be an expression
+* `-M` or `--metric`: the metric expression which will be queried, it can be an expression
 * `-F` or `--from`: time frame for which to query metrics, defaults to "30seconds"
 * `-N` or `--name`: name to give to the metric, defaults to "value"
 * `-U` or `--username`: username used for basic authentication
@@ -22,6 +22,7 @@ check_graphite accepts the following options:
 * `-w`: warning threshold for the metric
 * `-c`: critical threshold for the metric
 * `-t`: timeout after which the metric should be considered unknown
+* `--niltozero`: converts nils to floating point zeros (0.0) in order to handle metrics that only emit non zero values
 
 ## How it works
 
