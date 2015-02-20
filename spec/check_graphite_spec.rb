@@ -3,6 +3,11 @@ require "fake_web"
 
 require "check_graphite"
 
+RSpec.configure do |config|
+  config.mock_with(:rspec) { |c| c.syntax = :should }
+  config.expect_with(:rspec) { |c| c.syntax = :should  }
+end
+
 describe CheckGraphite::Command do
   before do
     FakeWeb.allow_net_connect = false
@@ -99,6 +104,21 @@ describe CheckGraphite::Command do
       ARGV = %w{ -H http://your.graphite.host/render -M all.values.null }
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?no valid datapoints/)
+      lambda { c.run }.should raise_error SystemExit
+    end
+  end
+
+  describe "when Graphite returns only NULL values with niltozero enabled" do
+    before do
+      FakeWeb.register_uri(:get, "http://your.graphite.host/render?target=all.values.null&from=-30seconds&format=json",
+                           :body => '[{"target": "all.values.null", "datapoints": [[null, 1339512060], [null, 1339512120], [null, 1339512180], [null, 1339512240]]}]',
+                           :content_type => "application/json")
+    end
+
+    it "should be unknown" do
+      ARGV = %w{ -H http://your.graphite.host/render -M all.values.null --niltozero true }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with("OK: value=0.0|value=0.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
   end
