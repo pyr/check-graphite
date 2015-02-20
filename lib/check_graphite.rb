@@ -16,12 +16,15 @@ module CheckGraphite
     on "--password PASSWORD", "-P PASSWORD"
     on "--dropfirst N", "-A N", Integer, :default => 0
     on "--droplast N", "-Z N", Integer, :default => 0
+    on "--niltozero TRUEORFALSE", :default => 'false'
 
     enable_warning
     enable_critical
     enable_timeout
 
     def check
+      raise 'Invalid value for --niltozero (true or false)' unless options.niltozero == 'true' or options.niltozero == 'false'
+
       uri = URI(URI.encode("#{options.endpoint}?target=#{options.metric}&from=-#{options.from}&format=json"))
       req = Net::HTTP::Get.new(uri.request_uri)
 
@@ -44,10 +47,10 @@ module CheckGraphite
       )
 
       # Remove NULL values. Return UNKNOWN if there's nothing left.
-      datapoints.reject! { |v| v.first.nil? }
+      datapoints.reject! { |v| v.first.nil? } unless options.niltozero == 'true'
       raise "no valid datapoints" if datapoints.size == 0
 
-      sum = datapoints.reduce(0.0) {|acc, v| acc + v.first }
+      sum = datapoints.reduce(0.0) {|acc, v| acc + v.first.to_f }
       value = sum / datapoints.size
       store_value options.name, value
       store_message "#{options.name}=#{value}"
