@@ -86,6 +86,13 @@ describe CheckGraphite::Command do
       STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?no data returned for target/)
       lambda { c.run }.should raise_error SystemExit
     end
+
+    it "should be ok when ignoring missing data" do
+      ARGV = %w{ -H http://your.graphite.host/render -M value.does.not.exist --ignore-missing }
+      c = CheckGraphite::Command.new
+      STDOUT.should_receive(:puts).with(/OK: value missing - ignoring/)
+      lambda { c.run }.should raise_error SystemExit
+    end
   end
 
   describe "when Graphite returns only NULL values" do

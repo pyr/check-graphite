@@ -16,6 +16,9 @@ module CheckGraphite
     on "--password PASSWORD", "-P PASSWORD"
     on "--dropfirst N", "-A N", Integer, :default => 0
     on "--droplast N", "-Z N", Integer, :default => 0
+    on "--ignore-missing", :default => false do
+        options.send("ignore-missing=", true)
+    end
 
     enable_warning
     enable_critical
@@ -35,7 +38,15 @@ module CheckGraphite
       }
 
       raise "HTTP error code #{res.code}" unless res.code == "200"
-      raise "no data returned for target" if res.body == "[]"
+      if res.body == "[]"
+        if options.send("ignore-missing")
+          store_value options.name, -1
+          store_message "#{options.name} missing - ignoring"
+          return
+        else
+          raise "no data returned for target"
+        end
+      end
 
       datapoints = JSON(res.body).map { |e| e["datapoints"] }.reduce { |a, b| a + b }
       datapoints = datapoints.slice(
