@@ -16,42 +16,42 @@ describe CheckGraphite::Command do
     end
 
     it "should return OK" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("OK: value=4.0|value=4.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
     it "should return WARNING" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -w 0 }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -w 0 })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("WARNING: value=4.0|value=4.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
     it "should return CRITICAL" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -c 0 }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -c 0 })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("CRITICAL: value=4.0|value=4.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
     it "should honour dropfirst" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --dropfirst 1 }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --dropfirst 1 })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("OK: value=5.0|value=5.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
     it "should honour droplast" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --droplast 1 }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --droplast 1 })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("OK: value=3.0|value=3.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
     it "should honour dropfirst and droplast together" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --dropfirst 1 --droplast 1 }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm --dropfirst 1 --droplast 1 })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("OK: value=4.0|value=4.0;;;;")
       lambda { c.run }.should raise_error SystemExit
@@ -66,7 +66,7 @@ describe CheckGraphite::Command do
     end
 
     it "should discard them" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("OK: value=2.0|value=2.0;;;;")
       lambda { c.run }.should raise_error SystemExit
@@ -81,14 +81,14 @@ describe CheckGraphite::Command do
     end
 
     it "should be unknown" do
-      ARGV = %w{ -H http://your.graphite.host/render -M value.does.not.exist }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M value.does.not.exist })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?no data returned for target/)
       lambda { c.run }.should raise_error SystemExit
     end
 
     it "should be ok when ignoring missing data" do
-      ARGV = %w{ -H http://your.graphite.host/render -M value.does.not.exist --ignore-missing }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M value.does.not.exist --ignore-missing })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with(/OK: value missing - ignoring/)
       lambda { c.run }.should raise_error SystemExit
@@ -103,7 +103,7 @@ describe CheckGraphite::Command do
     end
 
     it "should be unknown" do
-      ARGV = %w{ -H http://your.graphite.host/render -M all.values.null }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M all.values.null })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?no valid datapoints/)
       lambda { c.run }.should raise_error SystemExit
@@ -118,7 +118,7 @@ describe CheckGraphite::Command do
     end
 
     it "should return OK" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox*.load.load.midterm }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox*.load.load.midterm })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("OK: value=4.0|value=4.0;;;;")
       lambda { c.run }.should raise_error SystemExit
@@ -136,14 +136,14 @@ describe CheckGraphite::Command do
     end
 
     it "should work with valid username and password" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -U testuser -P testpass}
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -U testuser -P testpass})
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with("OK: value=2.0|value=2.0;;;;")
       lambda { c.run }.should raise_error SystemExit
     end
 
     it "should fail with bad username and password" do
-      ARGV = %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -U baduser -P badpass }
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M collectd.somebox.load.load.midterm -U baduser -P badpass })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with(/UNKNOWN: INTERNAL ERROR: (RuntimeError: )?HTTP error code 401/)
       lambda { c.run }.should raise_error SystemExit
