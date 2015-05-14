@@ -22,6 +22,7 @@ check_graphite accepts the following options:
 * `-w`: warning threshold for the metric
 * `-c`: critical threshold for the metric
 * `-t`: timeout after which the metric should be considered unknown
+* `--ignore-missing`: return `OK` when the metric doesn't exist yet e.g. errors have not occurred
 
 ## How it works
 
