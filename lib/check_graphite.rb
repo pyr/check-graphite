@@ -16,7 +16,7 @@ module CheckGraphite
     on "--password PASSWORD", "-P PASSWORD"
     on "--dropfirst N", "-A N", Integer, :default => 0
     on "--droplast N", "-Z N", Integer, :default => 0
-    on "--ignore-missing", :default => false do
+    on "-I", "--ignore-missing", :default => false do
         options.send("ignore-missing=", true)
     end
 
