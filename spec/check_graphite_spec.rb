@@ -88,7 +88,7 @@ describe CheckGraphite::Command do
     end
 
     it "should be ok when ignoring missing data" do
-      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M value.does.not.exist --ignore-missing })
+      stub_const("ARGV", %w{ -H http://your.graphite.host/render -M value.does.not.exist --ignore-missing -w 1 -c 3 })
       c = CheckGraphite::Command.new
       STDOUT.should_receive(:puts).with(/OK: value missing - ignoring/)
       lambda { c.run }.should raise_error SystemExit

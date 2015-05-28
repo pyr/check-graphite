@@ -40,7 +40,7 @@ module CheckGraphite
       raise "HTTP error code #{res.code}" unless res.code == "200"
       if res.body == "[]"
         if options.send("ignore-missing")
-          store_value options.name, -1
+          store_value options.name, 0
           store_message "#{options.name} missing - ignoring"
           return
         else
