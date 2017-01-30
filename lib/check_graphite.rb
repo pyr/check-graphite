@@ -58,6 +58,13 @@ module CheckGraphite
       datapoints.reject! { |v| v.first.nil? }
       raise "no valid datapoints" if datapoints.size == 0
 
+      processor = options.processor || method(:present_value)
+      processor.call(datapoints)
+    end
+
+    private
+
+    def present_value(datapoints)
       sum = datapoints.reduce(0.0) {|acc, v| acc + v.first }
       value = sum / datapoints.size
       store_value options.name, value
