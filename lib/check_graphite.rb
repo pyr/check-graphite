@@ -2,11 +2,13 @@ require "nagios_check"
 require "json"
 require "net/https"
 require "check_graphite/version"
+require 'check_graphite/projection'
 
 module CheckGraphite
 
   class Command
     include NagiosCheck
+    include Projection
 
     on "--endpoint ENDPOINT", "-H ENDPOINT", :mandatory
     on "--metric METRIC", "-M METRIC", :mandatory
