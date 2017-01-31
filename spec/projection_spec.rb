@@ -1,7 +1,7 @@
 require 'check_graphite/projection'
 require 'nagios_check'
 
-describe describe CheckGraphite::Projection do
+describe CheckGraphite::Projection do
   let :check do
     Class.new do
       attr_reader :values
@@ -10,7 +10,7 @@ describe describe CheckGraphite::Projection do
     end.new
   end
 
-  describe 'primary value' do
+  describe 'when looking at the primary value' do
     subject do
       check.prepare
       check.send(:parse_options, ['--projection', projection])
@@ -33,7 +33,7 @@ describe describe CheckGraphite::Projection do
     end
   end
 
-  describe 'p-value' do
+  describe 'when looking at the p-value' do
     subject do
       check.prepare
       check.send(:parse_options, ['--projection', projection])
@@ -54,27 +54,27 @@ describe describe CheckGraphite::Projection do
       it { should eq("1.0") }
     end
   end
+end
 
-  describe 'integration test' do
-    before do
-      FakeWeb.register_uri(
-        :get, "http://your.graphite.host/render?target=collectd.somebox.load.load.midterm&from=-30seconds&format=json",
-        :body => '[{"target": "collectd.somebox.load.load.midterm", "datapoints": [[1.0, 1339512060], [2.0, 1339512120], [6.0, 1339512180], [7.0, 1339512240]]}]',
-        :content_type => "application/json"
-      )
-    end
+describe 'when invoking graphite with --projection' do
+  before do
+    FakeWeb.register_uri(
+      :get, "http://your.graphite.host/render?target=collectd.somebox.load.load.midterm&from=-30seconds&format=json",
+      :body => '[{"target": "collectd.somebox.load.load.midterm", "datapoints": [[1.0, 1339512060], [2.0, 1339512120], [6.0, 1339512180], [7.0, 1339512240]]}]',
+      :content_type => "application/json"
+    )
+  end
 
-    it 'should output value, projection interval and p-value' do
-      stub_const("ARGV", %w{
-        -H http://your.graphite.host/render
-        -M collectd.somebox.load.load.midterm
-        -c 0:10
-        --projection 5min
-        --name ze-name
-      })
-      c = CheckGraphite::Command.new
-      STDOUT.should_receive(:puts).with(match(/ze-name.*in 5min.*p-value=0.9/))
-      lambda { c.run }.should raise_error SystemExit
-    end
+  it 'outputs value, projection interval and p-value' do
+    stub_const("ARGV", %w{
+      -H http://your.graphite.host/render
+      -M collectd.somebox.load.load.midterm
+      -c 0:10
+      --projection 5min
+      --name ze-name
+    })
+    c = CheckGraphite::Command.new
+    STDOUT.should_receive(:puts).with(match(/ze-name.*in 5min.*p-value=0.9/))
+    lambda { c.run }.should raise_error SystemExit
   end
 end
