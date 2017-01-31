@@ -7,8 +7,8 @@ module CheckGraphite
   module Projection
     def self.included(base)
       base.on '--projection FUTURE_TIMEFRAME', :default => '2days' do |timeframe|
-        options.send('processor=', method(:projected_value))
-        options.send('timeframe=', timeframe)
+        options.send(:processor=, method(:projected_value))
+        options.send(:timeframe=, timeframe)
       end
     end
 

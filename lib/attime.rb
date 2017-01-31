@@ -36,24 +36,26 @@ module CheckGraphite
     "year" => 365 * DAY,
     "years" => "year",
   }
-  EXPR = /([+-])?([0-9]*)(.*)/
+  EXPR = /^([+-])?([0-9.]*)(.*)$/
 
   def self.attime(text, time = Time.now)
     match = EXPR.match(text)
     raise "Unparseable time period #{text}" unless match
     sign, scalar, unit = match[1..3]
-    raise "Missing scalar in time #{text}" if scalar == ""
-    raise "Missing unit in #{text}" if unit == ""
-    time + Integer(scalar) * lookup(unit) * (sign == "-" ? -1 : 1)
+    raise "Missing scalar in time #{text}" if scalar.empty?
+    raise "Missing unit in #{text}" if unit.empty?
+    time + Float(scalar) * lookup(unit) * (sign == "-" ? -1 : 1)
   end
 
   private
 
   def self.lookup(unit)
     x = UNITS[unit.downcase]
-    raise "Bad unit #{unit}" unless x
-    if x.is_a? String
+    case x
+    when String
       lookup(x)
+    when nil
+      raise "Bad unit #{unit}"
     else
       x
     end
