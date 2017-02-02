@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
   s.add_runtime_dependency "linear-regression", "~> 0.0.2"
-  s.add_runtime_dependency "nagios_check"
+  s.add_runtime_dependency "nagios_check", "~> 0.4.0"
 
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
