@@ -23,6 +23,7 @@ check_graphite accepts the following options:
 * `-c`: critical threshold for the metric
 * `-t`: timeout after which the metric should be considered unknown
 * `--ignore-missing`: return `OK` when the metric doesn't exist yet e.g. errors have not occurred
+* `--projection`: Warn on a value linearly extrapolated into the future, defaults to "2days"
 
 ## How it works
 
@@ -31,3 +32,5 @@ points collected, it then checks the value against supplied thresholds. Threshol
 in the format given in [The Nagios Developer Guidelines](http://nagiosplug.sourceforge.net/developer-guidelines.html#THRESHOLDFORMAT).
 
 NaN values are not taken into account in the average
+
+When running with --projection, note that you probably want to set a bigger --from window so you get a reasonable projection. Both --from and --projection accepts arguments in Graphite format.

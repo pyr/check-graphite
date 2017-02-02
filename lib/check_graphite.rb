@@ -2,11 +2,13 @@ require "nagios_check"
 require "json"
 require "net/https"
 require "check_graphite/version"
+require 'check_graphite/projection'
 
 module CheckGraphite
 
   class Command
     include NagiosCheck
+    include Projection
 
     on "--endpoint ENDPOINT", "-H ENDPOINT", :mandatory
     on "--metric METRIC", "-M METRIC", :mandatory
@@ -58,6 +60,13 @@ module CheckGraphite
       datapoints.reject! { |v| v.first.nil? }
       raise "no valid datapoints" if datapoints.size == 0
 
+      processor = options.processor || method(:present_value)
+      processor.call(datapoints)
+    end
+
+    private
+
+    def present_value(datapoints)
       sum = datapoints.reduce(0.0) {|acc, v| acc + v.first }
       value = sum / datapoints.size
       store_value options.name, value
