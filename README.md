@@ -28,6 +28,6 @@ check_graphite accepts the following options:
 
 check_graphite, asks for a small window of metrics, and computes an average over the last valid
 points collected, it then checks the value against supplied thresholds. Thresholds are expressed
-in the format given in [The Nagios Developer Guidelines](http://nagiosplug.sourceforge.net/developer-guidelines.html#THRESHOLDFORMAT).
+in the format given in [The Nagios Developer Guidelines](https://nagios-plugins.org/doc/guidelines.html#THRESHOLDFORMAT).
 
 NaN values are not taken into account in the average
