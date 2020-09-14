@@ -3,6 +3,15 @@ require "fake_web"
 
 require "check_graphite"
 
+RSpec.configure do |config|
+  config.expect_with :rspec do |c|
+    c.syntax = [:should, :expect]
+  end
+  config.mock_with :rspec do |c|
+    c.syntax = [:should, :expect]
+  end
+end
+
 describe CheckGraphite::Command do
   before do
     FakeWeb.allow_net_connect = false
